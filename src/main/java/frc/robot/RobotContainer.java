@@ -24,15 +24,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.commands.IntakeBucket;
-import frc.robot.commands.OuttakeBucket;
-import frc.robot.commandgroup.PickupBucket;
-import frc.robot.commands.ArmToPos;
 import frc.robot.generated.TunerConstants;
 import frc.robot.AutoRoutines;
-import frc.robot.subsystems.ClawSubsystem;
+import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.FlipperSubsystem;
+
 
 
 public class RobotContainer {
@@ -41,6 +37,7 @@ public class RobotContainer {
     private double MaxAngularRate = RotationsPerSecond.of(1*Math.PI).in(RadiansPerSecond); // 1/2 of a rotation per second max angular velocity
 
 
+    // THIS IS ALL SWERVE DRIVE SETUP
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -52,103 +49,113 @@ public class RobotContainer {
 
 
 
-    private final CommandXboxController joystick = new CommandXboxController(0);
+    // Creates a xbox controller to use in driver control
+    private final CommandXboxController joystick = new CommandXboxController(0); 
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
+
+    // Creates an instance of the drivetrain
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(); 
                 
-    private final Telemetry logger = new Telemetry(MaxSpeed);
+    private final Telemetry logger = new Telemetry(MaxSpeed); // This is not important right now. It is used for logging robot data
 
 
      /* Path follower */
-    private final AutoFactory autoFactory;
-    private final AutoRoutines autoRoutines;
-    private final AutoChooser autoChooser = new AutoChooser();
+    private final AutoFactory autoFactory; // Choreo Auto
+    private final AutoRoutines autoRoutines; // Choreo Auto
+    private final AutoChooser autoChooser = new AutoChooser(); // Choreo Autochooser
 
-    private final Field2d m_field = new Field2d();
+    private final Field2d m_field = new Field2d(); //IGNORE ME
 
-    private ClawSubsystem buildClaw() {
+
+/*---------------------------------------------------------------------------------------------------------------- */
+// FOR PEOPLE LEARNING, YOU ONLY CARE ABOUT THINGS BELOW THIS LINE!!! (FOR NOW) 
+// MOSTLY LINES 77-92 and 147-157
+
+    // A custom builder method that creates an instance of ExampleSubsystem
+    private ExampleSubsystem buildSubsystem() {
         return new ClawSubsystem(15);
     }
 
-    private FlipperSubsystem buildFlipper() {
-        return new FlipperSubsystem(16);
-    }
-
-
-    private ClawSubsystem getClaw() {
-        return claw;
-    }
-
-    private FlipperSubsystem getFlipper() {
-        return flipper;
+    // A custom getter class so that we dont accidentally mess up the variable (exSub) that we have created
+    //If you need to access the subsystem, USE THIS!
+    private ClawSubsystem getExampleSubsystem() {
+        return exSub;
     }
 
     
-    private final ClawSubsystem claw = buildClaw();
-    private final FlipperSubsystem flipper = buildFlipper();
+    private final ClawSubsystem exSub = buildSubsystem(); //Calls method to create subsystem instance and puts it in a variable we can use
 
 
 
-  public RobotContainer() {
+// YOU DONT CARE ABOUT THIS YET!
+    public RobotContainer() {
 
-    autoFactory = drivetrain.createAutoFactory();
-    autoRoutines = new AutoRoutines(autoFactory);
+        autoFactory = drivetrain.createAutoFactory();
+        autoRoutines = new AutoRoutines(autoFactory);
 
-    autoChooser.addRoutine("SimplePath", autoRoutines::simplePathAuto);
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+        autoChooser.addRoutine("SimplePath", autoRoutines::simplePathAuto);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    SmartDashboard.putData("Field", m_field);
+        SmartDashboard.putData("Field", m_field);
 
-    configureBindings();
+        configureBindings();
 
-  }
+    }
 
-  private void configureBindings() {
+    private void configureBindings() {
       // Note that X is defined as forward according to WPILib convention,
       // and Y is defined as to the left according to WPILib convention.
-      drivetrain.setDefaultCommand(
-          // Drivetrain will execute this command periodically
-          drivetrain.applyRequest(() ->
-              drive.withVelocityX(-joystick.getLeftY() * MaxSpeed * governor) // Drive forward with negative Y (forward)
-                  .withVelocityY(-joystick.getLeftX() * MaxSpeed * governor) // Drive left with negative X (left)
-                  .withRotationalRate(-joystick.getRightX() * MaxAngularRate * governor) // Drive counterclockwise with negative X (left)
-          )
-      );
+        drivetrain.setDefaultCommand(
+            // Drivetrain will execute this command periodically
+            drivetrain.applyRequest(() ->
+                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed * governor) // Drive forward with negative Y (forward)
+                    .withVelocityY(-joystick.getLeftX() * MaxSpeed * governor) // Drive left with negative X (left)
+                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate * governor) // Drive counterclockwise with negative X (left)
+            )
+        );
 
-    //   joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-      joystick.b().whileTrue(drivetrain.applyRequest(() ->
-          point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-      ));
+        joystick.b().whileTrue(drivetrain.applyRequest(() ->
+            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        ));
 
-      joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
-          forwardStraight.withVelocityX(0.5).withVelocityY(0))
-      );
-      joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
-          forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-      );
-
-      // Run SysId routines when holding back/start and X/Y.
-      // Note that each routine should be run exactly once in a single log.
-      joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-      joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-      joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-      joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
-      // reset the field-centric heading on left bumper press
-      joystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
-      joystick.leftTrigger().whileTrue(new PickupBucket(getFlipper(), getClaw())).onFalse((getClaw().runOnce(() -> getClaw().setClawSpeed(0)).andThen(new ArmToPos(getFlipper(), 0))));
-      joystick.rightTrigger().toggleOnTrue(new ArmToPos(getFlipper(), -0.47)).toggleOnFalse(new ArmToPos(getFlipper(), 0));
-      joystick.leftBumper().whileTrue(new ArmToPos(getFlipper(),-0.25)).onFalse(new ArmToPos(getFlipper(),0));
-      joystick.leftBumper().and(joystick.rightBumper()).whileTrue(new OuttakeBucket(getClaw()));
-      joystick.x().whileTrue(getClaw().runOnce(() -> getClaw().setClawSpeed(0.15))).whileFalse(getClaw().runOnce(() -> getClaw().setClawSpeed(0)));
+        joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0.5).withVelocityY(0))
+        );
+        joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
+        );
 
 
 
-      drivetrain.registerTelemetry(logger::telemeterize);
-  }
+        //NOTE: LAMBDA EXPRESSION DEFINITION
+        //A lambda expression creates a command that only exists when it is called. It is created, run, and then destroyed to save memory. 
+        //This is the function of the runOnce(() -> (method to run)) structure
+        //PS: THEY ARE VERY CONVIENIENT TO USE!
 
-  public Command getAutonomousCommand() {
+        //While the "a" button is being pressed on the controller, run a lambda expression on the subsystem.
+        //This one gets the a specific motor within the subsytem and sets the speed 
+        joystick.a().whileTrue(getExampleSubsystem().runOnce(() -> getMotorA().setClawSpeed(0.15)))
+        //                               /\                           /\                /\    
+        //                               |                            |                 |
+        //                               |                            |                 |
+        //                               |                            |                 |
+        //                    Subsystem to be accessed          Getter method           The method within the subsystem 
+        //                                                     within subsystem         for the intended action
+        //                                                      to access motor         (in this example we are setting the claw speed)
+        //                                                     that will be used
+    
+
+
+        //Same as above example but instead turns the motor off on the "x" button
+        joystick.x().whileTrue(getExampleSubsystem().runOnce(() -> getMotorA().setClawSpeed(0)))
+
+
+        //IGNORE THIS! THIS IS LOGGING!
+        drivetrain.registerTelemetry(logger::telemeterize);
+    }
+
+  public Command getAutonomousCommand() { 
       /* First put the drivetrain into auto run mode, then run the auto */
       return autoChooser.selectedCommand();
   }

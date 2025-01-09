@@ -4,40 +4,49 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ClawSubsystem extends SubsystemBase {
+public class ExampleSubsystem extends SubsystemBase {
 
-    // Talon Init
-    private final TalonFX m_claw;
+    // Create a motor variable for use in code 
+    private final TalonFX example_motor; 
 
-    public ClawSubsystem(int clawCANId) {
-        m_claw = new TalonFX(clawCANId);
+
+    // Initialization of Subsystem and it's motors
+    // This is what is called when you create a new object of class ExampleSubsystem
+    public ExampleSubsystem(int motorID) {
+        example_motor = new TalonFX(motorID); // Sets the motor variable equal to the constuctor for a CTRE motor given the motor ID
     }
+
+
+    /** IMPORTANT FOR PEOPLE LEARNING
+    The following two methods are examples of custom methods. They can be called in other files as a way of interacting with the subsystem
+    and the motors within the subsystem.
+    THIS IS HOW YOU WILL INTERACT WITH SUBSYSTEMS!!!. All important variables should be private and have public getter and/or setter methods
+    that can be used instead.
+    */
+
 
      /**
-     * Set speed of claw motor 
+     * CUSTOM SETTER METHOD: 
+     * Set speed of motor 
+     * USE THIS TO SET THE SPEED OF THE MOTOR
      */
-    public void setClawSpeed(double speed){
-        m_claw.set(speed);
+    public void setMotorSpeed(double speed){ 
+        example_motor.set(speed); // This is a CTRE function sets the speed of the motor to the given speed
     }
+
 
     /**
-     * Checks if claw motor is stalling/is experiencing a current spike due to successful intake
-     *
-     * @return True or False
+     * CUSTOM GETTER METHOD:
+     * Get motor instance
+     * USE THIS TO GET A SPECIFIC MOTOR WITHIN A SUBSYSTEM
      */
-    public boolean holdingBucket(){
-        double clawCurrent = m_claw.getStatorCurrent().getValueAsDouble();
-        // System.out.println("INTAKE CURRENT: " + intakecur);
-        if (clawCurrent > 110){
-            return true;
-        }
-        return false;
+    public TalonFX getMotorA(){
+        return example_motor;
     }
 
-    public TalonFX getClawMotor(){
-        return m_claw;
-    }
 
+
+    // The following two methods are in every subsystem and run everytime the code scheduler checks the motor
 
     @Override
     public void periodic() {
@@ -47,7 +56,6 @@ public class ClawSubsystem extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        System.out.println("Intake voltage: " + m_claw.getMotorVoltage());
     
     }
 }
