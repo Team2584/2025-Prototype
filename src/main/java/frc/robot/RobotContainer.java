@@ -74,17 +74,17 @@ public class RobotContainer {
 
     // A custom builder method that creates an instance of ExampleSubsystem
     private ExampleSubsystem buildSubsystem() {
-        return new ClawSubsystem(15);
+        return new ExampleSubsystem(15);
     }
 
     // A custom getter class so that we dont accidentally mess up the variable (exSub) that we have created
     //If you need to access the subsystem, USE THIS!
-    private ClawSubsystem getExampleSubsystem() {
+    private ExampleSubsystem getExampleSubsystem() {
         return exSub;
     }
 
     
-    private final ClawSubsystem exSub = buildSubsystem(); //Calls method to create subsystem instance and puts it in a variable we can use
+    private final ExampleSubsystem exSub = buildSubsystem(); //Calls method to create subsystem instance and puts it in a variable we can use
 
 
 
@@ -135,20 +135,19 @@ public class RobotContainer {
 
         //While the "a" button is being pressed on the controller, run a lambda expression on the subsystem.
         //This one gets the a specific motor within the subsytem and sets the speed 
-        joystick.a().whileTrue(getExampleSubsystem().runOnce(() -> getMotorA().setClawSpeed(0.15)))
+        joystick.a().whileTrue(getExampleSubsystem().runOnce(() -> getExampleSubsystem().setMotorSpeed(0.15)));
         //                               /\                           /\                /\    
         //                               |                            |                 |
         //                               |                            |                 |
         //                               |                            |                 |
-        //                    Subsystem to be accessed          Getter method           The method within the subsystem 
-        //                                                     within subsystem         for the intended action
-        //                                                      to access motor         (in this example we are setting the claw speed)
-        //                                                     that will be used
+        //                    Subsystem to be accessed          Subsystem that       The method within the subsystem 
+        //                                                      has the method       for the intended action
+        //                                                                           (in this example we are setting the speed of a motor)
     
 
 
         //Same as above example but instead turns the motor off on the "x" button
-        joystick.x().whileTrue(getExampleSubsystem().runOnce(() -> getMotorA().setClawSpeed(0)))
+        joystick.x().whileTrue(getExampleSubsystem().runOnce(() -> getExampleSubsystem().setMotorSpeed(0)));
 
 
         //IGNORE THIS! THIS IS LOGGING!
