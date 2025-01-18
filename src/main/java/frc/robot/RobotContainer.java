@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.AutoRoutines;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 
@@ -76,6 +77,10 @@ public class RobotContainer {
     private ExampleSubsystem buildSubsystem() {
         return new ExampleSubsystem(15);
     }
+    private ElevatorSubsystem buildSubsystem() {
+        return new ElevatorSubsystem(15);
+    }
+
 
     // A custom getter class so that we dont accidentally mess up the variable (exSub) that we have created
     //If you need to access the subsystem, USE THIS!
@@ -83,8 +88,13 @@ public class RobotContainer {
         return exSub;
     }
 
-    
+    private ElevatorSubsystem getElevatorSubsystem() {
+        return exSub;
+    }
+
+
     private final ExampleSubsystem exSub = buildSubsystem(); //Calls method to create subsystem instance and puts it in a variable we can use
+    private final ElevatorSubsystem exSub = buildSubsystem(); //Calls method to create subsystem instance and puts it in a variable we can use
 
 
 
@@ -135,7 +145,7 @@ public class RobotContainer {
 
         //While the "a" button is being pressed on the controller, run a lambda expression on the subsystem.
         //This one gets the a specific motor within the subsytem and sets the speed 
-        joystick.a().whileTrue(getExampleSubsystem().runOnce(() -> getExampleSubsystem().setMotorSpeed(0.15)));
+        //joystick.a().whileTrue(getExampleSubsystem().runOnce(() -> getExampleSubsystem().setMotorSpeed(0.15)));
         //                               /\                           /\                /\    
         //                               |                            |                 |
         //                               |                            |                 |
@@ -147,8 +157,11 @@ public class RobotContainer {
 
 
         //Same as above example but instead turns the motor off on the "x" button
-        joystick.x().whileTrue(getExampleSubsystem().runOnce(() -> getExampleSubsystem().setMotorSpeed(0)));
+        //joystick.x().whileTrue(getExampleSubsystem().runOnce(() -> getExampleSubsystem().setMotorSpeed(0)));
 
+
+        joystick.a().whileTrue(getElevatorSubsystem().runOnce(() -> getElevatorSubsystem().setMotorSpeed(0.15)));
+        joystick.x().whileTrue(getElevatorSubsystem().runOnce(() -> getElevatorSubsystem().setMotorSpeed(0)));
 
         //IGNORE THIS! THIS IS LOGGING!
         drivetrain.registerTelemetry(logger::telemeterize);
