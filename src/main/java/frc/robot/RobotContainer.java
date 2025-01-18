@@ -26,9 +26,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.AutoRoutines;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+
+//subsystems
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.AlgaeIntakeSubsystem;
 
 
 
@@ -77,8 +80,11 @@ public class RobotContainer {
     private ExampleSubsystem buildSubsystem() {
         return new ExampleSubsystem(15);
     }
-    private ElevatorSubsystem buildSubsystem() {
-        return new ElevatorSubsystem(15);
+    private ElevatorSubsystem buildElevatorSubsystem() {
+        return new ElevatorSubsystem(16);
+    }
+    private AlgaeIntakeSubsystem buildAlgaeIntakeSubsystem() {
+        return new AlgaeIntakeSubsystem(17);
     }
 
 
@@ -89,14 +95,19 @@ public class RobotContainer {
     }
 
     private ElevatorSubsystem getElevatorSubsystem() {
-        return exSub;
+        return elSub;
+    }
+
+    private AlgaeIntakeSubsystem getAlgaeIntakeSubsystem() {
+        return algSub;
     }
 
 
     private final ExampleSubsystem exSub = buildSubsystem(); //Calls method to create subsystem instance and puts it in a variable we can use
-    private final ElevatorSubsystem exSub = buildSubsystem(); //Calls method to create subsystem instance and puts it in a variable we can use
+    private final ElevatorSubsystem elSub = buildElevatorSubsystem(); //Calls method to create subsystem instance and puts it in a variable we can use
+    private final AlgaeIntakeSubsystem algSub = buildAlgaeIntakeSubsystem(); //Calls method to create subsystem instance and puts it in a variable we can use
 
-
+//AlgaeIntakeSubsystem
 
 // YOU DONT CARE ABOUT THIS YET!
     public RobotContainer() {
@@ -159,16 +170,16 @@ public class RobotContainer {
         //Same as above example but instead turns the motor off on the "x" button
         //joystick.x().whileTrue(getExampleSubsystem().runOnce(() -> getExampleSubsystem().setMotorSpeed(0)));
 
-
-        joystick.a().whileTrue(getElevatorSubsystem().runOnce(() -> getElevatorSubsystem().setMotorSpeed(0.15)));
-        joystick.x().whileTrue(getElevatorSubsystem().runOnce(() -> getElevatorSubsystem().setMotorSpeed(0)));
+        
+        joystick.a().whileTrue(getAlgaeIntakeSubsystem().runOnce(() -> getElevatorSubsystem().setMotorSpeed(0.15)));
+        joystick.x().whileTrue(getAlgaeIntakeSubsystem().runOnce(() -> getElevatorSubsystem().setMotorSpeed(0)));
 
         //IGNORE THIS! THIS IS LOGGING!
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
-  public Command getAutonomousCommand() { 
+    public Command getAutonomousCommand() { 
       /* First put the drivetrain into auto run mode, then run the auto */
       return autoChooser.selectedCommand();
-  }
+    }
 }
